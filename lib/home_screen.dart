@@ -87,6 +87,14 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       ),
+      bottomNavigationBar: BottomNavigationBar(items: [
+        BottomNavigationBarItem(icon: IconButton(onPressed: () {
+        }, icon: Icon(Icons.home)),label: "Home"),
+        BottomNavigationBarItem(icon: IconButton(onPressed: () {
+        }, icon: Icon(Icons.accessible_outlined)), label: "Shop"),
+        BottomNavigationBarItem(icon: IconButton(onPressed: () {
+        }, icon: Icon(Icons.person)), label: "Profile"),
+      ]),
     );
   }
 }
