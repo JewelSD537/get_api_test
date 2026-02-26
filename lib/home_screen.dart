@@ -11,90 +11,67 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  List product = [];
+  List<dynamic> product = [];
+
+  Future<void> fetchData() async {
+    final uri = Uri.parse("https://dummyjson.com/products");
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+
+      final jsonData = jsonDecode(response.body);
+
+      setState(() {
+        product = jsonData["products"];
+      });
+
+    } else {
+      print("Not Found");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    getProduct();
-  }
-
-  Future<void> getProduct() async {
-    final url = Uri.parse("https://jsonplaceholder.typicode.com/posts");
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-
-      setState(() {
-        product = jsonResponse;
-      });
-    }
+    fetchData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: const Center(
-          child: Text(
-            "API Product",
-            style: TextStyle(color: Colors.black),
-          ),
-        ),
+        title: const Center(child: Text("Get API")),
       ),
 
       body: product.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : GridView.builder(
-        padding: const EdgeInsets.all(10),
-        gridDelegate:
-        const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 1,
-        ),
+          : ListView.builder(
         itemCount: product.length,
         itemBuilder: (context, index) {
-
-          return Container(
-            padding: const EdgeInsets.all(8),
-            color: Colors.grey.shade300,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product[index]["title"],
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+          return Card(
+            margin: const EdgeInsets.all(10),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product[index]["title"],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-
-                const SizedBox(height: 8),
-
-                Expanded(
-                  child: Text(
-                    product[index]["body"],
-                    maxLines: 4,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+                  const SizedBox(height: 5),
+                  Text(product[index]["description"], maxLines: 1,
+                    overflow: TextOverflow.ellipsis,),
+                  Text(product[index]["category"]),
+                ],
+              ),
             ),
           );
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(items: [
-        BottomNavigationBarItem(icon: IconButton(onPressed: () {
-        }, icon: Icon(Icons.home)),label: "Home"),
-        BottomNavigationBarItem(icon: IconButton(onPressed: () {
-        }, icon: Icon(Icons.accessible_outlined)), label: "Shop"),
-        BottomNavigationBarItem(icon: IconButton(onPressed: () {
-        }, icon: Icon(Icons.person)), label: "Profile"),
-      ]),
     );
   }
 }
